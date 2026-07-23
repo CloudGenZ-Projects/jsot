@@ -3,9 +3,7 @@ import { BookOpen, Video, MessageSquare, ExternalLink, Play, Loader2 } from "luc
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import api from "@/utils/api";
-
-// Helper to define backend base URL for images
-const API_BASE_URL = "http://localhost:5000";
+import { getImageUrl as resolveImageUrl } from "@/utils/mediaUrl";
 
 const tabs = [
   { id: "articles", label: "Featured Articles", icon: BookOpen },
@@ -83,11 +81,8 @@ export function ResourceLibrary() {
     fetchResources();
   }, []);
 
-  // Helper to handle image paths (uploads vs external URLs)
-  const getImageUrl = (path) => {
-    if (!path) return "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop";
-    if (path.startsWith("http")) return path;
-    return `${API_BASE_URL}${path}`;
+  const getImageUrl = (path: string | null) => {
+    return resolveImageUrl(path, "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop");
   };
 
   return (

@@ -2,7 +2,7 @@ import './config/env.js';
 import path from 'path';
 import express from 'express';
 import cors from 'cors';
-import './config/db.js';
+import sequelize from './config/db.js';
 import adminRoutes from './routes/adminRoutes.js';
 
 
@@ -52,5 +52,15 @@ app.get('/api/panchang-2025', (req, res) => {
         res.status(500).json({ message: "Server Error" });
     }
 });
+
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+sequelize.sync({ alter: true })
+  .then(() => {
+    console.log('Database synced successfully');
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  })
+  .catch((err) => {
+    console.error('Failed to sync database:', err);
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  });

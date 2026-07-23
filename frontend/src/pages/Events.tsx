@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import api from "@/utils/api";
+import { getImageUrl } from "@/utils/mediaUrl";
 import {
   isBefore, parseISO, startOfDay, startOfMonth, endOfMonth,
   startOfWeek, endOfWeek, eachDayOfInterval, isSameMonth,
@@ -107,12 +108,6 @@ const EventsPage = () => {
       }
     }
   }, [loading, location]);
-
-  const getImageUrl = (path) => {
-    if (!path) return null;
-    if (path.startsWith('http')) return path;
-    return `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}${path}`;
-  };
 
   const getEventDate = (event) => {
     if (event.fullDate) return parseISO(event.fullDate);

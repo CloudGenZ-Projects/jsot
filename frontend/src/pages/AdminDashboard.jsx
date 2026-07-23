@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import api from '@/utils/api';
+import { getImageUrl } from '@/utils/mediaUrl';
 
 import DeleteConfirmationModal from './DeleteConfirmationModal';
 
@@ -49,23 +50,6 @@ const getTypeColor = (typeName) => {
   return `border ${dynamicPalette[index]}`;
 };
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
-console.log("Using BACKEND_URL:", BACKEND_URL);
-const IMAGE_BASE_URL = BACKEND_URL.endsWith('/') ? BACKEND_URL.slice(0, -1) : BACKEND_URL;
-
-
-const getImageUrl = (path) => {
-  if (!path) return "";
-  
- 
-  if (path.startsWith("http://") || path.startsWith("https://")) {
-    return path;
-  }
-  
-
-  const safePath = path.startsWith('/') ? path : `/${path}`;
-  return `${IMAGE_BASE_URL}${safePath}`;
-};
 // ----------------------------------------
 
 const ITEMS_PER_PAGE = 4;

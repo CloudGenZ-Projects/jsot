@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import api from "@/utils/api"; // Using your API utility
+import { getImageUrl as resolveImageUrl } from "@/utils/mediaUrl";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { 
@@ -23,10 +24,6 @@ import { format } from "date-fns";
 import exteriorImg1 from "@/assets/EXTERIOR-VIEW-CAM-01-768x384.jpg";
 import exteriorImg2 from "@/assets/EXTERIOR-VIEW-CAM-02-300x106.jpg";
 
-// --- DYNAMIC BACKEND URL LOGIC ---
-const BACKEND_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
-const IMAGE_BASE_URL = BACKEND_URL.endsWith('/') ? BACKEND_URL.slice(0, -1) : BACKEND_URL;
-
 const ResourcesPage = () => {
   const location = useLocation();
   const [articles, setArticles] = useState([]);
@@ -34,18 +31,9 @@ const ResourcesPage = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("articles");
 
-  // --- 1. Helper: Image URL Handler (FIXED SLASH ISSUE) ---
-  const getImageUrl = (path) => {
-    if (!path) return "https://placehold.co/600x400?text=JSOT+Media";
-    
-    // Agar path pehle se hi external (http/https) hai
-    if (path.startsWith("http://") || path.startsWith("https://")) {
-      return path;
-    }
-    
-    // Local path mein slash ensure karo
-    const safePath = path.startsWith('/') ? path : `/${path}`;
-    return `${IMAGE_BASE_URL}${safePath}`;
+  // --- 1. Helper: Image URL Handler ---
+  const getImageUrl = (path: string | null) => {
+    return resolveImageUrl(path, "https://placehold.co/600x400?text=JSOT+Media");
   };
 
   // --- 2. Helper: Date Formatter ---

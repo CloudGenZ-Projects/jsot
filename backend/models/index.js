@@ -13,9 +13,6 @@ const EventType = EventTypeModel(sequelize,);
 const Article = ArticleModel(sequelize);
 const Video = VideoModel(sequelize);
 
-
-await sequelize.sync({ alter: true });
-
 export {
   sequelize,
   Admin,
