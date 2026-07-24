@@ -4,18 +4,17 @@ import api from "@/utils/api"; // Using your API utility
 import { getImageUrl as resolveImageUrl } from "@/utils/mediaUrl";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { NewsletterArchive } from "@/components/NewsletterArchive"; // <-- IMPORTED COMPONENT
 import { 
   Building2, 
   Mail, 
   Newspaper, 
   Video as VideoIcon, 
-  Calendar, 
   User, 
   ExternalLink, 
   PlayCircle,
   Loader2 
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { format } from "date-fns";
@@ -37,7 +36,7 @@ const ResourcesPage = () => {
   };
 
   // --- 2. Helper: Date Formatter ---
-  const formatDate = (dateString) => {
+  const formatDate = (dateString: string) => {
     if (!dateString) return "";
     try {
       return format(new Date(dateString), "MMMM d, yyyy");
@@ -151,8 +150,13 @@ const ResourcesPage = () => {
           </div>
         </section>
 
+
+        {/* ---------------- MONTHLY NEWSLETTER SECTION ---------------- */}
+        <NewsletterArchive />
+
+
         {/* ---------------- MEDIA SECTION (Tabs Design) ---------------- */}
-        <section id="media-section" className="py-16 md:py-24 bg-muted/20 scroll-mt-20">
+        <section id="media-section" className="py-16 md:py-24 bg-muted/20 scroll-mt-20 border-t border-gold/20">
           <div className="container mx-auto px-4">
             
             {/* Header */}
@@ -195,7 +199,7 @@ const ResourcesPage = () => {
                   <TabsContent value="articles" className="animate-fade-in focus-visible:ring-0">
                     {articles.length > 0 ? (
                       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {articles.map((article) => (
+                        {articles.map((article: any) => (
                           <Card key={article.id} className="border-gold/20 overflow-hidden group hover:shadow-xl transition-all duration-300 h-full flex flex-col">
                             <div className="p-4 pb-0">
                               <div className="relative w-full h-48 overflow-hidden rounded-md border border-gold/10">
@@ -203,7 +207,7 @@ const ResourcesPage = () => {
                                   src={getImageUrl(article.image)}
                                   alt={article.title}
                                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                  onError={(e) => { e.target.src = "https://placehold.co/600x400?text=Article"; }}
+                                  onError={(e: any) => { e.target.src = "https://placehold.co/600x400?text=Article"; }}
                                 />
                                 <div className="absolute top-2 right-2 bg-white/90 backdrop-blur text-secondary text-xs px-2 py-1 rounded font-medium shadow-sm">
                                   {formatDate(article.date)}
@@ -247,7 +251,7 @@ const ResourcesPage = () => {
                   <TabsContent value="videos" className="animate-fade-in focus-visible:ring-0">
                     {videos.length > 0 ? (
                       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {videos.map((video) => (
+                        {videos.map((video: any) => (
                           <Card key={video.id} className="border-gold/20 overflow-hidden group hover:shadow-xl transition-all duration-300 h-full flex flex-col">
                              <div className="p-4 pb-0">
                                <div 
@@ -259,7 +263,7 @@ const ResourcesPage = () => {
                                    src={getImageUrl(video.thumbnail)}
                                    alt={video.title}
                                    className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-500"
-                                   onError={(e) => { e.target.src = "https://placehold.co/600x400?text=Video"; }}
+                                   onError={(e: any) => { e.target.src = "https://placehold.co/600x400?text=Video"; }}
                                  />
                                  <div className="absolute inset-0 flex items-center justify-center z-20">
                                    <div className="w-12 h-12 rounded-full bg-white/30 backdrop-blur-sm flex items-center justify-center group-hover/img:scale-110 transition-transform">
