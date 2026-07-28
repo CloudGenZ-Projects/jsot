@@ -199,7 +199,7 @@ const Visit = () => {
                       // Fallback if data hasn't loaded
                       <>
                         <p className="text-muted-foreground">Everyday (Mon – Sun)</p>
-                        <p className="text-xl font-medium text-gold">9:00 AM – 6:00 PM</p>
+                        <p className="text-xl font-medium text-gold">9:00 AM – 7:00 PM</p>
                       </>
                     )}
                   </div>
@@ -216,6 +216,7 @@ const Visit = () => {
                     <p className="text-muted-foreground">Jain Society of Toronto Inc.</p>
                     <p className="text-muted-foreground">441 Ellesmere Road,</p>
                     <p className="text-muted-foreground">Scarborough, ON M1R 4E5 Canada</p>
+                     <p className="text-muted-foreground">entrance is to from the back gate <br /> Opposite to Costo on Canadian Road</p>
                   </div>
                 </div>
 

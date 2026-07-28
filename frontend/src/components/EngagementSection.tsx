@@ -70,21 +70,6 @@ export function EngagementSection() {
                 </div>
               ))}
             </div>
-
-            <div className="mt-8 p-6 bg-white/50 backdrop-blur-sm rounded-lg border border-gold/20">
-              <h4 className="font-serif text-xl font-semibold text-gold mb-2">Membership Options</h4>
-              {/* Membership details text color updated */}
-              <div className="grid grid-cols-2 gap-4 text-[#8C1919]">
-                <div>
-                  <span className="text-2xl font-bold text-gold">$150</span>
-                  <span className="text-sm block">Individual / Year</span>
-                </div>
-                <div>
-                  <span className="text-2xl font-bold text-gold">$250</span>
-                  <span className="text-sm block">Family / Year</span>
-                </div>
-              </div>
-            </div>
           </div>
 
           {/* Buttons Container */}
