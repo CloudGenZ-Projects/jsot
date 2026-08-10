@@ -15,10 +15,12 @@ const app = express();
 
 const allowedOrigins = [
   'http://localhost:8080',      
+  'http://191.215.37.177',
   'https://jsot.cloudgenz.com', 
   'https://jsotcanada.org',     
   'https://www.jsotcanada.org'  
 ];
+
 
 app.use(cors({
   origin: function (origin, callback) {
