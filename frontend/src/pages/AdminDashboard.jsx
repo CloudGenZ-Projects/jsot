@@ -66,6 +66,35 @@ const formatTime = (timeString) => {
   return `${formattedHour}:${minutes} ${ampm}`;
 };
 
+const getTorontoNow = () => {
+  try {
+    const formatter = new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/Toronto",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+    });
+
+    const parts = formatter.formatToParts(new Date());
+    const findPart = (type) => parts.find((p) => p.type === type)?.value || "";
+
+    const year = parseInt(findPart("year"), 10);
+    const month = parseInt(findPart("month"), 10) - 1;
+    const day = parseInt(findPart("day"), 10);
+    const hour = parseInt(findPart("hour"), 10);
+    const minute = parseInt(findPart("minute"), 10);
+    const second = parseInt(findPart("second"), 10);
+
+    return new Date(year, month, day, hour, minute, second);
+  } catch (e) {
+    return new Date();
+  }
+};
+
 const ITEMS_PER_PAGE = 4;
 
 const AdminDashboard = () => {
@@ -310,7 +339,8 @@ const AdminDashboard = () => {
     if (editEventId) { showToast("Save changes before filtering", "error"); return; }
     setFilterDate(day);
     setCurrentPage(1);
-    const isStrictlyPast = isPast(day) && !isSameDay(day, new Date());
+    const torontoNow = getTorontoNow();
+    const isStrictlyPast = isBefore(day, startOfDay(torontoNow));
     if (isStrictlyPast && eventView !== 'past') setEventView('past');
     else if (!isStrictlyPast && eventView !== 'upcoming') setEventView('upcoming');
   };
@@ -433,51 +463,37 @@ const AdminDashboard = () => {
   // ... (Pagination Logic) ...
   const isEventExpired = (event) => {
     if (!event.fullDate) return false;
-    
-    const eventDate = parseISO(event.fullDate);
-    const now = new Date();
 
-    // 1. Agar Date Aaj se pehle ki hai (Yesterday etc.) -> EXPIRED
-    if (isBefore(eventDate, startOfDay(now))) {
+    const [y, m, d] = event.fullDate.split('-').map(Number);
+    const eventDate = new Date(y, m - 1, d);
+    const now = getTorontoNow();
+    const todayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    // 1. Strictly Before Today in Toronto -> EXPIRED
+    if (eventDate < todayDate) {
       return true;
     }
 
-    // 2. Agar Date Aaj ke baad ki hai (Tomorrow etc.) -> NOT EXPIRED
-    if (isBefore(startOfDay(now), eventDate)) {
+    // 2. Strictly After Today in Toronto -> NOT EXPIRED
+    if (eventDate > todayDate) {
       return false;
     }
 
-    // 3. Agar Date AAJ ki hai -> Check Time
-    if (isSameDay(eventDate, now)) {
-      const timeToCheck = event.endTime || event.time;
-      if (!timeToCheck) return false; // Time nahi hai toh pure din upcoming maano
-      
-      try {
-        // Input time format "HH:mm" (24 hour) hota hai backend se
-        // Lekin agar format alag ho to safety ke liye parse try karenge
-        const timeString = timeToCheck.trim();
-        const eventDateTimeStr = `${event.fullDate}T${timeString}:00`;
-        const specificEventDate = new Date(eventDateTimeStr);
+    // 3. Is TODAY in Toronto -> Check Time
+    const timeToCheck = event.endTime || event.time;
+    if (!timeToCheck) return false;
 
-        if (!isNaN(specificEventDate.getTime())) {
-             // Agar Event End Time < Current Time -> EXPIRED
-             return specificEventDate < now;
-        }
+    try {
+      const [hStr, mStr] = timeToCheck.split(':');
+      const h = parseInt(hStr, 10);
+      const min = parseInt(mStr, 10);
+      if (isNaN(h)) return false;
 
-        // Fallback agar format parsing fail ho (e.g. "10:00 AM" text)
-        const timeFormats = ['h:mm aa', 'hh:mm aa', 'HH:mm', 'h:mm a', 'h:mma'];
-        for (const fmt of timeFormats) {
-          const result = parse(timeString, fmt, eventDate);
-          if (!isNaN(result.getTime())) {
-             return isBefore(result, now);
-          }
-        }
-      } catch (e) {
-        return false;
-      }
+      const eventEndTimeOnToday = new Date(y, m - 1, d, h, isNaN(min) ? 0 : min, 0);
+      return eventEndTimeOnToday < now;
+    } catch (e) {
+      return false;
     }
-    
-    return false;
   };
 
   // Lists ko naye logic se filter karein
@@ -493,17 +509,16 @@ const AdminDashboard = () => {
     ? eventsList
         .filter(ev => !isEventExpired(ev)) // UPCOMING Logic
         .sort((a, b) => {
-           // Sort by Date then Time
-           const dateA = new Date(`${a.fullDate}T${a.time || '00:00'}`);
-           const dateB = new Date(`${b.fullDate}T${b.time || '00:00'}`);
-           return dateA - dateB; 
+           const dateDiff = (a.fullDate || "").localeCompare(b.fullDate || "");
+           if (dateDiff !== 0) return dateDiff;
+           return (a.time || "00:00").localeCompare(b.time || "00:00");
         })
     : eventsList
         .filter(ev => isEventExpired(ev)) // PAST Logic
         .sort((a, b) => {
-           const dateA = new Date(`${a.fullDate}T${a.time || '00:00'}`);
-           const dateB = new Date(`${b.fullDate}T${b.time || '00:00'}`);
-           return dateB - dateA; // Descending
+           const dateDiff = (b.fullDate || "").localeCompare(a.fullDate || "");
+           if (dateDiff !== 0) return dateDiff;
+           return (b.time || "00:00").localeCompare(a.time || "00:00");
         });
 
   const filteredEvents = activeEventsList.filter(event => {

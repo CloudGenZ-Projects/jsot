@@ -109,6 +109,47 @@ const EventsPage = () => {
     }
   }, [loading, location]);
 
+  const getTorontoNow = () => {
+    try {
+      const formatter = new Intl.DateTimeFormat("en-US", {
+        timeZone: "America/Toronto",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      });
+
+      const parts = formatter.formatToParts(new Date());
+      const findPart = (type) => parts.find((p) => p.type === type)?.value || "";
+
+      const year = parseInt(findPart("year"), 10);
+      const month = parseInt(findPart("month"), 10) - 1;
+      const day = parseInt(findPart("day"), 10);
+      const hour = parseInt(findPart("hour"), 10);
+      const minute = parseInt(findPart("minute"), 10);
+      const second = parseInt(findPart("second"), 10);
+
+      return new Date(year, month, day, hour, minute, second);
+    } catch (e) {
+      return new Date();
+    }
+  };
+
+  const sortEventsAsc = (a, b) => {
+    const dateDiff = (a.fullDate || "").localeCompare(b.fullDate || "");
+    if (dateDiff !== 0) return dateDiff;
+    return (a.time || "00:00").localeCompare(b.time || "00:00");
+  };
+
+  const sortEventsDesc = (a, b) => {
+    const dateDiff = (b.fullDate || "").localeCompare(a.fullDate || "");
+    if (dateDiff !== 0) return dateDiff;
+    return (b.time || "00:00").localeCompare(a.time || "00:00");
+  };
+
   const getEventDate = (event) => {
     if (event.fullDate) return parseISO(event.fullDate);
     try {
@@ -140,45 +181,40 @@ const EventsPage = () => {
     return `${formattedStart} - ${formatTime(endTime)}`;
   };
 
-  // --- MAIN LOGIC TO CHECK IF EVENT IS PAST (DATE + TIME) ---
+  // --- MAIN LOGIC TO CHECK IF EVENT IS PAST (DATE + TIME IN TORONTO TIMEZONE) ---
   const isEventExpired = (event) => {
     if (!event.fullDate) return false;
     
-    const eventDate = getEventDate(event);
-    const now = new Date();
+    const [y, m, d] = event.fullDate.split('-').map(Number);
+    const eventDate = new Date(y, m - 1, d);
+    const now = getTorontoNow();
+    const todayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-    // 1. Strictly Before Today (Yesterday, etc.)
-    if (isBefore(eventDate, startOfDay(now))) {
+    // 1. Strictly Before Today in Toronto (Yesterday, etc.)
+    if (eventDate < todayDate) {
       return true;
     }
 
-    // 2. Strictly After Today (Tomorrow, etc.)
-    if (isBefore(startOfDay(now), eventDate)) {
+    // 2. Strictly After Today in Toronto (Tomorrow, etc.)
+    if (eventDate > todayDate) {
       return false;
     }
 
-    // 3. Is TODAY - Check Time
-    if (isSameDay(eventDate, now)) {
-      const timeToCheck = event.endTime || event.time;
-      if (!timeToCheck) return false; // No time provided? Assume upcoming for today.
+    // 3. Is TODAY in Toronto - Check Time
+    const timeToCheck = event.endTime || event.time;
+    if (!timeToCheck) return false; // No time provided? Assume upcoming for today.
 
-      try {
-        const timeString = timeToCheck.trim();
-        const timeFormats = ['h:mm aa', 'hh:mm aa', 'HH:mm', 'h:mm a', 'h:mma', 'h:mm'];
-        
-        for (const fmt of timeFormats) {
-          const result = parse(timeString, fmt, eventDate);
-          if (!isNaN(result.getTime())) {
-             // If Parsed Time < Now => Expired
-             return isBefore(result, now);
-          }
-        }
-      } catch (e) {
-        return false;
-      }
+    try {
+      const [hStr, mStr] = timeToCheck.split(':');
+      const h = parseInt(hStr, 10);
+      const min = parseInt(mStr, 10);
+      if (isNaN(h)) return false;
+
+      const eventEndTimeOnToday = new Date(y, m - 1, d, h, isNaN(min) ? 0 : min, 0);
+      return eventEndTimeOnToday < now;
+    } catch (e) {
+      return false;
     }
-
-    return false;
   };
 
   useEffect(() => {
@@ -210,8 +246,8 @@ const EventsPage = () => {
           }
         });
 
-        upcoming.sort((a, b) => getEventDate(a).getTime() - getEventDate(b).getTime());
-        past.sort((a, b) => getEventDate(b).getTime() - getEventDate(a).getTime());
+        upcoming.sort(sortEventsAsc);
+        past.sort(sortEventsDesc);
 
         setUpcomingEvents(upcoming);
         setPastEvents(past);
@@ -255,7 +291,9 @@ const EventsPage = () => {
 
   const getDisplayEvents = () => {
     if (selectedDate) {
-      return allEvents.filter(event => isSameDay(getEventDate(event), selectedDate));
+      return allEvents
+        .filter(event => isSameDay(getEventDate(event), selectedDate))
+        .sort(sortEventsAsc);
     }
 
     return selectedFilter === "All"
@@ -265,11 +303,14 @@ const EventsPage = () => {
 
   const filteredEvents = getDisplayEvents();
 
-  const totalPages = Math.ceil(filteredEvents.length / ITEMS_PER_PAGE);
-  const paginatedEvents = filteredEvents.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
+  // If a specific date is selected on the calendar, display all events for that day without pagination
+  const totalPages = selectedDate ? 1 : Math.ceil(filteredEvents.length / ITEMS_PER_PAGE);
+  const paginatedEvents = selectedDate
+    ? filteredEvents
+    : filteredEvents.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
+      );
 
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {
@@ -619,9 +660,9 @@ const EventsPage = () => {
                                       <Clock className="h-3.5 w-3.5 text-saffron flex-shrink-0" />
                                       {formatEventTime(event.time, event.endTime)}
                                     </span>
-                                    <span className="flex items-center gap-1.5">
-                                      <MapPin className="h-3.5 w-3.5 text-saffron flex-shrink-0" />
-                                      {event.location || "Temple Hall"}
+                                    <span className="flex items-start gap-1.5">
+                                      <MapPin className="h-3.5 w-3.5 text-saffron flex-shrink-0 mt-0.5" />
+                                      <span className="leading-normal">{event.location || "Main Temple Hall"}</span>
                                     </span>
                                   </div>
                                 </div>
@@ -631,7 +672,7 @@ const EventsPage = () => {
                         ))}
 
                         {/* Pagination Controls */}
-                        {totalPages > 1 && (
+                        {totalPages > 1 && !selectedDate && (
                           <div className="flex flex-wrap items-center justify-center gap-2 md:gap-4 mt-8 pt-4 border-t border-gold/10">
                             <button
                               onClick={() => handlePageChange(currentPage - 1)}

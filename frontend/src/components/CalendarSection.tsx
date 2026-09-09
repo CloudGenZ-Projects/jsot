@@ -35,6 +35,35 @@ const formatEventTime = (time?: string, endTime?: string) => {
   return `${formattedStart} - ${formatTime(endTime)}`;
 };
 
+const getTorontoNow = () => {
+  try {
+    const formatter = new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/Toronto",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+    });
+
+    const parts = formatter.formatToParts(new Date());
+    const findPart = (type: string) => parts.find((p) => p.type === type)?.value || "";
+
+    const year = parseInt(findPart("year"), 10);
+    const month = parseInt(findPart("month"), 10) - 1;
+    const day = parseInt(findPart("day"), 10);
+    const hour = parseInt(findPart("hour"), 10);
+    const minute = parseInt(findPart("minute"), 10);
+    const second = parseInt(findPart("second"), 10);
+
+    return new Date(year, month, day, hour, minute, second);
+  } catch (e) {
+    return new Date();
+  }
+};
+
 export function CalendarSection() {
   const [events, setEvents] = useState([]);
   const [timings, setTimings] = useState([]);
@@ -49,21 +78,21 @@ export function CalendarSection() {
         ]);
 
         const allEvents = eventsRes.data;
-        const today = startOfDay(new Date());
+        const torontoNow = getTorontoNow();
 
         const upcomingEvents = allEvents.filter((event) => {
-          const eventDate = event.fullDate 
-            ? parseISO(event.fullDate) 
-            : new Date(`${event.month} ${event.day}, ${event.year}`);
-
-          return !isBefore(eventDate, today);
+          if (!event.fullDate) return false;
+          const [y, m, d] = event.fullDate.split('-').map(Number);
+          const [h, min] = (event.endTime || event.time || '23:59').split(':').map(Number);
+          const eventEnd = new Date(y, m - 1, d, isNaN(h) ? 23 : h, isNaN(min) ? 59 : min, 0);
+          return eventEnd >= torontoNow;
         });
 
-        // Sort by date ascending (nearest first)
+        // Sort ascending by date and time
         upcomingEvents.sort((a, b) => {
-          const dateA = a.fullDate ? parseISO(a.fullDate) : new Date(a.date);
-          const dateB = b.fullDate ? parseISO(b.fullDate) : new Date(b.date);
-          return dateA - dateB;
+          const dateDiff = (a.fullDate || "").localeCompare(b.fullDate || "");
+          if (dateDiff !== 0) return dateDiff;
+          return (a.time || "00:00").localeCompare(b.time || "00:00");
         });
 
         setEvents(upcomingEvents); 
