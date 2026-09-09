@@ -1,8 +1,8 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MapPin, Phone, Mail, Clock, Calendar, ExternalLink } from "lucide-react";
+import { MapPin, Phone, Mail, Clock, Calendar, ExternalLink, X } from "lucide-react";
 import { ParyushanLiveTracker } from "@/components/ParyushanLiveTracker";
 
 // Importing Schedule Images
@@ -19,12 +19,27 @@ import whatsappQr from "@/assets/whatsappqr.jpg";
 import pathshalaQr from "@/assets/pathshalaqr.jpg";
 
 const ParyushanPage = () => {
+  // State to manage the currently selected image for the popup
+  const [selectedImage, setSelectedImage] = useState(null);
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
+  // Prevent background scrolling when image popup is open
+  useEffect(() => {
+    if (selectedImage) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [selectedImage]);
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
       <Header />
 
       <main>
@@ -117,9 +132,20 @@ const ParyushanPage = () => {
           <div className="container mx-auto px-4 text-center">
             <h2 className="font-serif text-3xl md:text-4xl font-bold text-secondary mb-10">Paryushan Schedule</h2>
             <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
-              <img src={p1} alt="Paryushan Schedule Part 1" className="w-full rounded-xl shadow-lg border border-gold/20 object-contain" />
-              <img src={p2} alt="Paryushan Schedule Part 2" className="w-full rounded-xl shadow-lg border border-gold/20 object-contain" />
+              <img 
+                src={p1} 
+                alt="Paryushan Schedule Part 1" 
+                className="w-full bg-white rounded-xl shadow-lg border border-gold/20 object-contain cursor-pointer hover:scale-[1.02] hover:shadow-xl transition-all p-1"
+                onClick={() => setSelectedImage(p1)} 
+              />
+              <img 
+                src={p2} 
+                alt="Paryushan Schedule Part 2" 
+                className="w-full bg-white rounded-xl shadow-lg border border-gold/20 object-contain cursor-pointer hover:scale-[1.02] hover:shadow-xl transition-all p-1" 
+                onClick={() => setSelectedImage(p2)} 
+              />
             </div>
+            <p className="text-muted-foreground mt-6 text-sm italic">Click on the images to view them clearly.</p>
           </div>
         </section>
 
@@ -234,10 +260,26 @@ const ParyushanPage = () => {
           <div className="container mx-auto px-4 text-center">
             <h2 className="font-serif text-3xl md:text-4xl font-bold text-secondary mb-10">Das Lakshan Schedule & Other Events</h2>
             <div className="grid lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
-              <img src={d1} alt="Das Lakshan Part 1" className="w-full rounded-xl shadow-lg border border-gold/20 object-contain hover:scale-[1.02] transition-transform" />
-              <img src={d2} alt="Das Lakshan Part 2" className="w-full rounded-xl shadow-lg border border-gold/20 object-contain hover:scale-[1.02] transition-transform" />
-              <img src={d3} alt="Das Lakshan Part 3" className="w-full rounded-xl shadow-lg border border-gold/20 object-contain hover:scale-[1.02] transition-transform" />
+              <img 
+                src={d1} 
+                alt="Das Lakshan Part 1" 
+                className="w-full bg-white rounded-xl shadow-lg border border-gold/20 object-contain cursor-pointer hover:scale-[1.02] hover:shadow-xl transition-all p-1" 
+                onClick={() => setSelectedImage(d1)} 
+              />
+              <img 
+                src={d2} 
+                alt="Das Lakshan Part 2" 
+                className="w-full bg-white rounded-xl shadow-lg border border-gold/20 object-contain cursor-pointer hover:scale-[1.02] hover:shadow-xl transition-all p-1" 
+                onClick={() => setSelectedImage(d2)} 
+              />
+              <img 
+                src={d3} 
+                alt="Das Lakshan Part 3" 
+                className="w-full bg-white rounded-xl shadow-lg border border-gold/20 object-contain cursor-pointer hover:scale-[1.02] hover:shadow-xl transition-all p-1" 
+                onClick={() => setSelectedImage(d3)} 
+              />
             </div>
+            <p className="text-muted-foreground mt-6 text-sm italic">Click on the images to view them clearly.</p>
           </div>
         </section>
 
@@ -319,6 +361,39 @@ const ParyushanPage = () => {
 
       </main>
       <Footer />
+
+      {/* Full-Screen Image Popup Modal */}
+      {selectedImage && (
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4 sm:p-8 backdrop-blur-sm"
+          onClick={() => setSelectedImage(null)}
+        >
+          <div className="relative w-full h-full flex items-center justify-center">
+            {/* Close Button */}
+            <button 
+              className="absolute top-4 right-4 md:top-8 md:right-8 text-white/70 hover:text-white bg-black/50 hover:bg-black/80 rounded-full p-2 transition-all z-[110]"
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedImage(null);
+              }}
+              aria-label="Close"
+            >
+              <X className="h-8 w-8" />
+            </button>
+            
+            {/* Enlarged Image */}
+            <img 
+              src={selectedImage} 
+              alt="Enlarged view" 
+              className="max-w-full max-h-full object-contain bg-white p-2 md:p-4 rounded-xl shadow-2xl cursor-zoom-out"
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedImage(null);
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
