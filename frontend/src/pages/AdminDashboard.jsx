@@ -52,6 +52,20 @@ const getTypeColor = (typeName) => {
 
 // ----------------------------------------
 
+const formatTime = (timeString) => {
+  if (!timeString) return "";
+  if (timeString.toLowerCase().includes("am") || timeString.toLowerCase().includes("pm")) {
+    return timeString;
+  }
+  const [hours, minutes] = timeString.split(':');
+  const hour = parseInt(hours, 10);
+  if (isNaN(hour)) return timeString;
+  
+  const ampm = hour >= 12 ? 'PM' : 'AM';
+  const formattedHour = hour % 12 || 12;
+  return `${formattedHour}:${minutes} ${ampm}`;
+};
+
 const ITEMS_PER_PAGE = 4;
 
 const AdminDashboard = () => {
@@ -115,21 +129,6 @@ const AdminDashboard = () => {
   const [videoData, setVideoData] = useState({
     title: '', speaker: '', videoLink: ''
   });
-
-  // --- HELPER FUNCTION: Convert 24h to 12h AM/PM ---
-  const formatTime = (timeString) => {
-    if (!timeString) return "";
-    if (timeString.toLowerCase().includes("am") || timeString.toLowerCase().includes("pm")) {
-      return timeString;
-    }
-    const [hours, minutes] = timeString.split(':');
-    const hour = parseInt(hours, 10);
-    if (isNaN(hour)) return timeString;
-    
-    const ampm = hour >= 12 ? 'PM' : 'AM';
-    const formattedHour = hour % 12 || 12;
-    return `${formattedHour}:${minutes} ${ampm}`;
-  };
 
   // --- DERIVED LOGIC FOR PAST EVENTS ---
 // --- DERIVED LOGIC FOR PAST EVENTS ---
