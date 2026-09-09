@@ -21,6 +21,8 @@ const navItems = [
     name: "Events",
     href: "/events",
     submenu: [
+      // --- ADDED PARYUSHAN PAGE HERE ---
+      { name: "Paryushan Mahaparva", href: "/paryushan" },
       { name: "Upcoming Events", href: "/events#upcoming" },
       { name: "Calendar", href: "/events#calendar" },
       { name: "Affiliated Groups", href: "/events#groups" },
@@ -30,7 +32,6 @@ const navItems = [
   {
     name: "Resources",
     href: "/resources",
-    // --- ADDED RESOURCES SUBMENU HERE ---
     submenu: [
       { name: "Project 441 Ellesmere", href: "/resources#441-ellesmere" },
       { name: "Articles", href: "/resources#articles" },
@@ -38,16 +39,14 @@ const navItems = [
       { name: "Newsletter", href: "/resources#subscribe-to-newsletter" },
     ]
   },
-  { name: "Visitors", href: '/Visitor' }
+  { name: "Visitors", href: '/visitor' } // Fixed casing to match App.tsx
 ];
 
 export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mobileSubmenuOpen, setMobileSubmenuOpen] = useState(null);
-  const [isDonateModalOpen, setIsDonateModalOpen] = useState(false); // Added state for Donate Modal
+  const [isDonateModalOpen, setIsDonateModalOpen] = useState(false);
   const location = useLocation();
-
-  const isExternalLink = (href) => href.startsWith("#");
 
   const toggleMobileSubmenu = (name) => {
     setMobileSubmenuOpen(mobileSubmenuOpen === name ? null : name);
@@ -347,9 +346,12 @@ export function Header() {
                 </li>
               </ul>
               
-              <h3 className="text-lg md:text-xl font-bold text-primary mt-6">
+              <h3 className="text-lg md:text-xl font-bold text-primary mt-6 border-b border-border pb-3 mb-4">
                 Stock Donations
               </h3>
+              <p className="text-sm md:text-base text-foreground/90">
+                Please contact the management committee for instructions regarding stock transfers and tax receipts.
+              </p>
             </div>
           </div>
         </div>
