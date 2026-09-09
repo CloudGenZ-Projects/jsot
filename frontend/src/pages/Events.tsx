@@ -119,6 +119,27 @@ const EventsPage = () => {
     }
   };
 
+  const formatTime = (timeString) => {
+    if (!timeString) return "";
+    if (timeString.toLowerCase().includes("am") || timeString.toLowerCase().includes("pm")) {
+      return timeString;
+    }
+    const [hours, minutes] = timeString.split(':');
+    const hour = parseInt(hours, 10);
+    if (isNaN(hour)) return timeString;
+    
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const formattedHour = hour % 12 || 12;
+    return `${formattedHour}:${minutes} ${ampm}`;
+  };
+
+  const formatEventTime = (time, endTime) => {
+    if (!time) return "";
+    const formattedStart = formatTime(time);
+    if (!endTime) return formattedStart;
+    return `${formattedStart} - ${formatTime(endTime)}`;
+  };
+
   // --- MAIN LOGIC TO CHECK IF EVENT IS PAST (DATE + TIME) ---
   const isEventExpired = (event) => {
     if (!event.fullDate) return false;
@@ -138,10 +159,11 @@ const EventsPage = () => {
 
     // 3. Is TODAY - Check Time
     if (isSameDay(eventDate, now)) {
-      if (!event.time) return false; // No time provided? Assume upcoming for today.
+      const timeToCheck = event.endTime || event.time;
+      if (!timeToCheck) return false; // No time provided? Assume upcoming for today.
 
       try {
-        const timeString = event.time.trim();
+        const timeString = timeToCheck.trim();
         const timeFormats = ['h:mm aa', 'hh:mm aa', 'HH:mm', 'h:mm a', 'h:mma', 'h:mm'];
         
         for (const fmt of timeFormats) {
@@ -357,6 +379,23 @@ const EventsPage = () => {
                   if(allExpired) isPastDay = true;
               }
 
+              // Sort events chronologically by time
+              const sortedDayEvents = hasEvent 
+                ? [...dayEvents].sort((a, b) => (a.time || '00:00').localeCompare(b.time || '00:00'))
+                : [];
+
+              // Edge alignment to avoid overflowing calendar card borders (0: Sun, 6: Sat)
+              const dayCol = i % 7;
+              let tooltipAlignClass = "left-1/2 -translate-x-1/2";
+              let arrowAlignClass = "left-1/2 -translate-x-1/2";
+              if (dayCol <= 1) {
+                tooltipAlignClass = "left-0 -translate-x-3";
+                arrowAlignClass = "left-6";
+              } else if (dayCol >= 5) {
+                tooltipAlignClass = "right-0 translate-x-3";
+                arrowAlignClass = "right-6";
+              }
+
               return (
                 <div key={i} className="relative group aspect-square flex items-center justify-center">
                   <button
@@ -376,17 +415,43 @@ const EventsPage = () => {
                   >
                     {format(day, "d")}
                   </button>
-                  {/* Tooltip */}
+
+                  {/* Hover Popover showing name and time for all events */}
                   {hasEvent && (
-                    <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 z-50 hidden md:group-hover:block w-max max-w-[150px]">
-                      <div className="bg-secondary text-secondary-foreground text-[10px] rounded p-2 shadow-lg border border-gold/20">
-                        {dayEvents.map((e, idx) => (
-                          <div key={idx} className="mb-1 last:mb-0 border-b border-white/10 last:border-0 pb-1 last:pb-0">
-                            <p className="font-bold truncate">{e.title}</p>
-                            <p className="opacity-80 text-[9px]">{e.time}</p>
-                          </div>
-                        ))}
-                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-secondary"></div>
+                    <div 
+                      className={`absolute bottom-full pb-2.5 ${tooltipAlignClass} z-50 hidden md:group-hover:block w-56 sm:w-60 pointer-events-auto animate-in fade-in zoom-in-95 duration-150`}
+                    >
+                      <div className="relative bg-secondary text-secondary-foreground rounded-lg p-2.5 shadow-2xl border border-gold/40 text-left">
+                        {/* Header with Date & Count */}
+                        <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-white/15">
+                          <span className="font-serif font-bold text-xs text-gold">
+                            {format(day, "MMM d")}
+                          </span>
+                          <span className="text-[10px] text-white/70">
+                            {dayEvents.length} {dayEvents.length === 1 ? 'event' : 'events'}
+                          </span>
+                        </div>
+
+                        {/* Event List with Scroll: Name and Time only */}
+                        <div className="space-y-1 event-tooltip-scroll pr-1">
+                          {sortedDayEvents.map((e, idx) => (
+                            <div 
+                              key={idx} 
+                              className="py-1 px-1.5 rounded hover:bg-white/5 transition-colors border-b border-white/10 last:border-0"
+                            >
+                              <p className="font-semibold text-white text-[11px] truncate leading-tight">
+                                {e.title}
+                              </p>
+                              <p className="text-gold/90 text-[10px] flex items-center gap-1 mt-0.5">
+                                <Clock className="w-2.5 h-2.5 text-gold shrink-0" />
+                                {formatEventTime(e.time, e.endTime) || "All Day"}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Downward Pointer Arrow */}
+                        <div className={`absolute -bottom-1.5 ${arrowAlignClass} border-4 border-transparent border-t-secondary pointer-events-none`}></div>
                       </div>
                     </div>
                   )}
@@ -552,7 +617,7 @@ const EventsPage = () => {
                                   <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs sm:text-sm text-muted-foreground pt-2 border-t border-gray-100">
                                     <span className="flex items-center gap-1.5">
                                       <Clock className="h-3.5 w-3.5 text-saffron flex-shrink-0" />
-                                      {event.time}
+                                      {formatEventTime(event.time, event.endTime)}
                                     </span>
                                     <span className="flex items-center gap-1.5">
                                       <MapPin className="h-3.5 w-3.5 text-saffron flex-shrink-0" />
