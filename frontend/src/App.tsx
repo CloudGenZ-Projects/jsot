@@ -17,7 +17,7 @@ import ResourcesPage from "./pages/ResourcesPage";
 import ContactPage from "./pages/ContactPage";
 import Visit from "./pages/Visit";
 import Pathshala from "./pages/PathshalaPage";
-
+import ParyushanPage from "./pages/ParyushanPage"; // --- Imported the new page here ---
 // --- 1. Create the ScrollToTop Component ---
 // This ensures that whenever the URL changes, the window scrolls up.
 const ScrollToTop = () => {
@@ -61,13 +61,13 @@ const App = () => (
           <Route path="/services" element={<Services />} />
           <Route path="/resources" element={<ResourcesPage />} />
           <Route path="/contact" element={<ContactPage />} />
-          
+          <Route path="/paryushan" element={<ParyushanPage />} />
+
           {/* Note: In your Footer you had "/Visitor" (Capital V). 
               Routes are case-sensitive. I changed this to lowercase 
               to match standard web practices. Ensure Footer matches "/visitor" */}
           <Route path="/visitor" element={<Visit/>} />
-          
-
+         
           {/* --- Admin Routes --- */}
           <Route path="/admin/login" element={<AdminLogin />} />
           

@@ -13,7 +13,9 @@ import {
   User, 
   ExternalLink, 
   PlayCircle,
-  Loader2 
+  Loader2,
+  Instagram,
+  Youtube
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -169,6 +171,28 @@ const ResourcesPage = () => {
               <p className="text-muted-foreground max-w-2xl mx-auto">
                 Explore our collection of articles and video discourses.
               </p>
+
+              {/* ----- SOCIAL MEDIA LINKS ADDED HERE ----- */}
+              <div className="flex flex-wrap justify-center gap-4 mt-8">
+                <a 
+                  href="https://www.instagram.com/jainsocietyoftoronto/?hl=en" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 border-2 border-gold/30 text-secondary hover:bg-gold hover:border-gold hover:text-white px-6 py-2.5 rounded-md transition-all font-medium shadow-sm"
+                >
+                  <Instagram className="h-5 w-5" /> Instagram
+                </a>
+                <a 
+                  href="https://www.youtube.com/@jainsocietyoftoronto-media131" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 border-2 border-gold/30 text-secondary hover:bg-gold hover:border-gold hover:text-white px-6 py-2.5 rounded-md transition-all font-medium shadow-sm"
+                >
+                  <Youtube className="h-5 w-5" /> YouTube Channel
+                </a>
+              </div>
+              {/* ----------------------------------------- */}
+
             </div>
 
             {/* TABS COMPONENT */}
