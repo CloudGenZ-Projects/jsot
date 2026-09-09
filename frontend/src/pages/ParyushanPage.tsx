@@ -164,9 +164,14 @@ const ParyushanPage = () => {
                     <p>Fixed Nakro for 10 Swapna for Phool ni Mala ($1008) & Sona ni Mala ($1107).</p>
                     <p>4 Ghee Bolis for Swapna (on the spot): Lakshmiji, Dev Viman, Padma Sarovar & Ratna no Dhaglo</p>
                   </div>
-                  <button className="w-full bg-saffron hover:bg-saffron/90 text-white py-2 rounded font-medium flex justify-center items-center gap-2 transition-colors">
+                  <a 
+                    href="https://docs.google.com/forms/d/e/1FAIpQLSfRTQEHU4nVe5HpMo5kTVeIA5sapVQGwG2-JhaxCjKekY7Hng/viewform" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="w-full bg-saffron hover:bg-saffron/90 text-white py-2 rounded font-medium flex justify-center items-center gap-2 transition-colors"
+                  >
                     Booking Link <ExternalLink className="w-4 h-4" />
-                  </button>
+                  </a>
                 </CardContent>
               </Card>
 
@@ -180,9 +185,14 @@ const ParyushanPage = () => {
                     <p>Ashtamangal Fixed Nakro for Phool ni Mala ($1008) & Sona ni Mala ($1107).</p>
                     <p>Ashtamangal will be given to the Labharthi for 1 year and must be returned 1 month before next Paryushan.</p>
                   </div>
-                  <button className="w-full bg-saffron hover:bg-saffron/90 text-white py-2 rounded font-medium flex justify-center items-center gap-2 transition-colors">
+                  <a 
+                    href="https://docs.google.com/forms/d/e/1FAIpQLSfRTQEHU4nVe5HpMo5kTVeIA5sapVQGwG2-JhaxCjKekY7Hng/viewform?usp=send_form" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="w-full bg-saffron hover:bg-saffron/90 text-white py-2 rounded font-medium flex justify-center items-center gap-2 transition-colors"
+                  >
                     Booking Link <ExternalLink className="w-4 h-4" />
-                  </button>
+                  </a>
                 </CardContent>
               </Card>
 
@@ -202,9 +212,14 @@ const ParyushanPage = () => {
                       <li>Puja 14-17: $405 (Dhoop-Dipak, Geet, Nritya Natak, Vajintra)</li>
                     </ul>
                   </div>
-                  <button className="w-full bg-saffron hover:bg-saffron/90 text-white py-2 rounded font-medium flex justify-center items-center gap-2 transition-colors">
+                  <a 
+                    href="https://docs.google.com/forms/d/e/1FAIpQLSc8J4kQ-QVXstZY3fORDM1nGrVFoJ2HpKcTge4fhotpUlEdfw/viewform" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="w-full bg-saffron hover:bg-saffron/90 text-white py-2 rounded font-medium flex justify-center items-center gap-2 transition-colors"
+                  >
                     Booking Link <ExternalLink className="w-4 h-4" />
-                  </button>
+                  </a>
                 </CardContent>
               </Card>
             </div>
