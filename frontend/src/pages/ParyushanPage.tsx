@@ -3,6 +3,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin, Phone, Mail, Clock, Calendar, ExternalLink } from "lucide-react";
+import { ParyushanLiveTracker } from "@/components/ParyushanLiveTracker";
 
 // Importing Schedule Images
 import p1 from "@/assets/p1.webp";
@@ -55,6 +56,9 @@ const ParyushanPage = () => {
             </div>
           </div>
         </section>
+
+        {/* Real-time Paryushan Live Companion Tracker */}
+        <ParyushanLiveTracker />
 
         {/* Welcome & Scholars Section */}
         <section className="py-12 bg-muted/30">
