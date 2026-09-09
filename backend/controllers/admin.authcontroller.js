@@ -77,10 +77,11 @@ export const getEvents = async (req, res) => {
 
 export const addEvent = async (req, res) => {
   try {
-    const { fullDate, time } = req.body;
+    const { fullDate, time, endTime } = req.body;
     let eventData = { ...req.body };
 
-    const isPast = checkIfEventIsPast(fullDate, time);
+    const timeToCheck = endTime || time;
+    const isPast = checkIfEventIsPast(fullDate, timeToCheck);
 
     if (isPast && req.files && req.files.length > 0) {
       // FIX: Sirf folder name aur file name save karo database me
@@ -101,7 +102,7 @@ export const addEvent = async (req, res) => {
 export const updateEvent = async (req, res) => {
   try {
     const { id } = req.params;
-    const { fullDate, time } = req.body;
+    const { fullDate, time, endTime } = req.body;
 
     const existingEvent = await Event.findOne({ where: { id } });
     if (!existingEvent) return res.status(404).json({ message: 'Event not found' });
@@ -109,7 +110,7 @@ export const updateEvent = async (req, res) => {
     let updateData = { ...req.body };
 
     const dateToCheck = fullDate || existingEvent.fullDate;
-    const timeToCheck = time || existingEvent.time;
+    const timeToCheck = (endTime !== undefined && endTime !== '' ? endTime : existingEvent.endTime) || (time || existingEvent.time);
 
     const isPast = checkIfEventIsPast(dateToCheck, timeToCheck);
 

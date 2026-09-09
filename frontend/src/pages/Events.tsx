@@ -119,6 +119,27 @@ const EventsPage = () => {
     }
   };
 
+  const formatTime = (timeString) => {
+    if (!timeString) return "";
+    if (timeString.toLowerCase().includes("am") || timeString.toLowerCase().includes("pm")) {
+      return timeString;
+    }
+    const [hours, minutes] = timeString.split(':');
+    const hour = parseInt(hours, 10);
+    if (isNaN(hour)) return timeString;
+    
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const formattedHour = hour % 12 || 12;
+    return `${formattedHour}:${minutes} ${ampm}`;
+  };
+
+  const formatEventTime = (time, endTime) => {
+    if (!time) return "";
+    const formattedStart = formatTime(time);
+    if (!endTime) return formattedStart;
+    return `${formattedStart} - ${formatTime(endTime)}`;
+  };
+
   // --- MAIN LOGIC TO CHECK IF EVENT IS PAST (DATE + TIME) ---
   const isEventExpired = (event) => {
     if (!event.fullDate) return false;
@@ -138,10 +159,11 @@ const EventsPage = () => {
 
     // 3. Is TODAY - Check Time
     if (isSameDay(eventDate, now)) {
-      if (!event.time) return false; // No time provided? Assume upcoming for today.
+      const timeToCheck = event.endTime || event.time;
+      if (!timeToCheck) return false; // No time provided? Assume upcoming for today.
 
       try {
-        const timeString = event.time.trim();
+        const timeString = timeToCheck.trim();
         const timeFormats = ['h:mm aa', 'hh:mm aa', 'HH:mm', 'h:mm a', 'h:mma', 'h:mm'];
         
         for (const fmt of timeFormats) {
@@ -383,7 +405,7 @@ const EventsPage = () => {
                         {dayEvents.map((e, idx) => (
                           <div key={idx} className="mb-1 last:mb-0 border-b border-white/10 last:border-0 pb-1 last:pb-0">
                             <p className="font-bold truncate">{e.title}</p>
-                            <p className="opacity-80 text-[9px]">{e.time}</p>
+                            <p className="opacity-80 text-[9px]">{formatEventTime(e.time, e.endTime)}</p>
                           </div>
                         ))}
                         <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-secondary"></div>
@@ -552,7 +574,7 @@ const EventsPage = () => {
                                   <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs sm:text-sm text-muted-foreground pt-2 border-t border-gray-100">
                                     <span className="flex items-center gap-1.5">
                                       <Clock className="h-3.5 w-3.5 text-saffron flex-shrink-0" />
-                                      {event.time}
+                                      {formatEventTime(event.time, event.endTime)}
                                     </span>
                                     <span className="flex items-center gap-1.5">
                                       <MapPin className="h-3.5 w-3.5 text-saffron flex-shrink-0" />

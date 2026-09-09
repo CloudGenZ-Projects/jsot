@@ -99,7 +99,7 @@ const AdminDashboard = () => {
   const [date, setDate] = useState();
 
   const [eventData, setEventData] = useState({
-    title: '', time: '', type: '', description: '', location: 'Main Temple Hall'
+    title: '', time: '', endTime: '', type: '', description: '', location: 'Main Temple Hall'
   });
 
   const [darshanData, setDarshanData] = useState({
@@ -145,10 +145,11 @@ const AdminDashboard = () => {
 
     // 3. Agar date aaj ki hai, time check karo
     if (isSameDay(date, now)) {
-        if (!eventData.time) return false;
+        const timeToCheck = eventData.endTime || eventData.time;
+        if (!timeToCheck) return false;
         // Combine Form Date + Form Time
         const dateStr = format(date, "yyyy-MM-dd");
-        const dateTimeStr = `${dateStr}T${eventData.time}:00`;
+        const dateTimeStr = `${dateStr}T${timeToCheck}:00`;
         const specificTime = new Date(dateTimeStr);
         
         if (!isNaN(specificTime.getTime())) {
@@ -238,7 +239,7 @@ const AdminDashboard = () => {
   
   const resetEventForm = () => {
     const defaultType = availableTypes.length > 0 ? availableTypes[0].name : '';
-    setEventData({ title: '', time: '', type: defaultType, description: '', location: 'Main Temple Hall' });
+    setEventData({ title: '', time: '', endTime: '', type: defaultType, description: '', location: 'Main Temple Hall' });
     setDate(undefined);
     setEditEventId(null);
     setSelectedFiles([]);
@@ -247,7 +248,12 @@ const AdminDashboard = () => {
 
   const handleEditEvent = (event) => {
     setEventData({
-      title: event.title, time: event.time, type: event.type, description: event.description, location: event.location
+      title: event.title,
+      time: event.time || '',
+      endTime: event.endTime || '',
+      type: event.type,
+      description: event.description,
+      location: event.location
     });
     if (event.fullDate) setDate(parseISO(event.fullDate));
     let images = [];
@@ -280,6 +286,7 @@ const AdminDashboard = () => {
       const formData = new FormData();
       formData.append('title', eventData.title);
       formData.append('time', eventData.time);
+      formData.append('endTime', eventData.endTime || '');
       formData.append('type', eventData.type);
       formData.append('description', eventData.description);
       formData.append('location', eventData.location);
@@ -443,17 +450,18 @@ const AdminDashboard = () => {
 
     // 3. Agar Date AAJ ki hai -> Check Time
     if (isSameDay(eventDate, now)) {
-      if (!event.time) return false; // Time nahi hai toh pure din upcoming maano
+      const timeToCheck = event.endTime || event.time;
+      if (!timeToCheck) return false; // Time nahi hai toh pure din upcoming maano
       
       try {
         // Input time format "HH:mm" (24 hour) hota hai backend se
         // Lekin agar format alag ho to safety ke liye parse try karenge
-        const timeString = event.time.trim();
+        const timeString = timeToCheck.trim();
         const eventDateTimeStr = `${event.fullDate}T${timeString}:00`;
         const specificEventDate = new Date(eventDateTimeStr);
 
         if (!isNaN(specificEventDate.getTime())) {
-             // Agar Event Time (e.g. 8:10 PM) < Current Time (e.g. 8:12 PM) -> EXPIRED
+             // Agar Event End Time < Current Time -> EXPIRED
              return specificEventDate < now;
         }
 
@@ -624,53 +632,68 @@ const AdminDashboard = () => {
                     </Popover>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <label className="text-xs font-semibold text-gray-500 uppercase">Time</label>
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between items-center h-5">
+                        <label className="text-xs font-semibold text-gray-500 uppercase">Start Time</label>
                         {isFieldLocked && <span className="text-[10px] text-red-500 font-bold">Locked</span>}
                       </div>
                       <Input
                         type="time"
-                        placeholder="e.g. 10:00 AM"
                         value={eventData.time}
                         onChange={e => setEventData({ ...eventData, time: e.target.value })}
                         required
                         disabled={isFieldLocked}
                       />
                     </div>
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <label className="text-xs font-semibold text-gray-500 uppercase">Type</label>
-                        {isFieldLocked && <span className="text-[10px] text-red-500 font-bold">Locked</span>}
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between items-center h-5">
+                        <label className="text-xs font-semibold text-gray-500 uppercase">End Time</label>
+                        {isFieldLocked ? (
+                          <span className="text-[10px] text-red-500 font-bold">Locked</span>
+                        ) : (
+                          <span className="text-[10px] text-muted-foreground font-normal">Optional</span>
+                        )}
                       </div>
-                      <div className="flex gap-2">
-                        <Select
-                          value={eventData.type}
-                          onValueChange={(val) => setEventData({ ...eventData, type: val })}
-                          disabled={isFieldLocked}
-                        >
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {availableTypes.map((t) => (
-                              <SelectItem key={t.id || t.name} value={t.name}>
-                                {t.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <Button
-                          type="button" variant="outline" size="icon" className="shrink-0"
-                          onClick={() => setIsTypeModalOpen(true)} disabled={isFieldLocked} title="Add Category"
-                        >
-                          <Plus className="h-4 w-4" />
-                        </Button>
-                      </div>
+                      <Input
+                        type="time"
+                        value={eventData.endTime}
+                        onChange={e => setEventData({ ...eventData, endTime: e.target.value })}
+                        disabled={isFieldLocked}
+                      />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-between items-center h-5">
+                      <label className="text-xs font-semibold text-gray-500 uppercase">Type</label>
+                      {isFieldLocked && <span className="text-[10px] text-red-500 font-bold">Locked</span>}
+                    </div>
+                    <div className="flex gap-2">
+                      <Select
+                        value={eventData.type}
+                        onValueChange={(val) => setEventData({ ...eventData, type: val })}
+                        disabled={isFieldLocked}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {availableTypes.map((t) => (
+                            <SelectItem key={t.id || t.name} value={t.name}>
+                              {t.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Button
+                        type="button" variant="outline" size="icon" className="shrink-0"
+                        onClick={() => setIsTypeModalOpen(true)} disabled={isFieldLocked} title="Add Category"
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center h-5">
                       <label className="text-xs font-semibold text-gray-500 uppercase">Location</label>
                       {isFieldLocked && <span className="text-[10px] text-red-500 font-bold">Locked</span>}
                     </div>
@@ -1187,7 +1210,11 @@ const UpcomingEventItem = ({ event, onEdit, onDelete, activeId }) => (
     <div className="flex-grow">
       <h4 className="font-semibold text-foreground text-lg">{event.title}</h4>
       <div className="text-sm text-muted-foreground flex flex-wrap gap-x-4 gap-y-1 mt-1">
-        <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> {event.time}</span>
+        <span className="flex items-center gap-1">
+          <Clock className="h-3.5 w-3.5" />
+          {formatTime(event.time)}
+          {event.endTime ? ` - ${formatTime(event.endTime)}` : ''}
+        </span>
         <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" /> {event.location}</span>
       </div>
     </div>
