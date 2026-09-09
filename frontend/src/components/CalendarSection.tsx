@@ -14,6 +14,27 @@ const typeColors = {
   Community: "bg-maroon text-secondary-foreground",
 };
 
+const formatTime = (timeString?: string) => {
+  if (!timeString) return "";
+  if (timeString.toLowerCase().includes("am") || timeString.toLowerCase().includes("pm")) {
+    return timeString;
+  }
+  const [hours, minutes] = timeString.split(':');
+  const hour = parseInt(hours, 10);
+  if (isNaN(hour)) return timeString;
+  
+  const ampm = hour >= 12 ? 'PM' : 'AM';
+  const formattedHour = hour % 12 || 12;
+  return `${formattedHour}:${minutes} ${ampm}`;
+};
+
+const formatEventTime = (time?: string, endTime?: string) => {
+  if (!time) return "";
+  const formattedStart = formatTime(time);
+  if (!endTime) return formattedStart;
+  return `${formattedStart} - ${formatTime(endTime)}`;
+};
+
 export function CalendarSection() {
   const [events, setEvents] = useState([]);
   const [timings, setTimings] = useState([]);
@@ -117,7 +138,7 @@ export function CalendarSection() {
                         <h4 className="text-lg font-semibold text-foreground">{nextEvent.title}</h4>
                         <p className="text-sm text-muted-foreground flex items-center gap-1 mt-2">
                           <Clock className="h-3 w-3" />
-                          {nextEvent.time}
+                          {formatEventTime(nextEvent.time, nextEvent.endTime)}
                         </p>
                         <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
                           {nextEvent.description || "Join us for this auspicious occasion."}

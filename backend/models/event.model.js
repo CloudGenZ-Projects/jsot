@@ -10,6 +10,7 @@ export default (sequelize) => {
         month: { type: DataTypes.STRING },
         year: { type: DataTypes.STRING },
         time: { type: DataTypes.STRING },
+        endTime: { type: DataTypes.STRING },
         type: { type: DataTypes.STRING }, 
         description: { type: DataTypes.TEXT },
         location: { type: DataTypes.STRING },
