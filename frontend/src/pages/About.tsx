@@ -46,8 +46,8 @@ const About = () => {
 
   // Added Contact List Data for the new card
   const contactList = [
-    { role: "General Inquiries", email: "jsotcanada.org" },
-    { role: "President, Board of Directors", email: "jsotcanada.org" },
+    { role: "General Inquiries", email: "info@jsotcanada.org" },
+    { role: "President, Board of Directors", email: "president@jsotcanada.org" },
     { role: "Donations, Accounting", email: "treasurer@jsotcanada.org" },
     { role: "Facility Booking, Events", email: "bookings@jsotcanada.org" },
     { role: "Pathshala, Education", email: "secretary@jsotcanada.org" },

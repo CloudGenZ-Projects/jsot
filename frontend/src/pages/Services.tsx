@@ -272,7 +272,7 @@ const ServicesPage = () => {
               </Button>
               <Button variant="outline" size="lg">
                 <Mail className="h-4 w-4 mr-2" />
-                Email: jsotcanada.org
+                Email: services@jsotcanada.org
               </Button>
             </div>
           </div>

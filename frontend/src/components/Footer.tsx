@@ -123,9 +123,9 @@ export function Footer() {
                 <Phone className="h-4 w-4" />
                 +1 (416) 555-1234
               </a>
-              <a href="mailto:jsotcanada.org" className="flex items-center gap-2 hover:text-gold transition-colors">
+              <a href="mailto:info@jsotcanada.org" className="flex items-center gap-2 hover:text-gold transition-colors">
                 <Mail className="h-4 w-4" />
-               jsotcanada.org
+                info@jsotcanada.org
               </a>
             </div>
 
