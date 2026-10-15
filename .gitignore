@@ -16,3 +16,11 @@ pnpm-debug.log*
 .DS_Store
 Thumbs.db
 frontend/.env
+
+# Migration artifacts
+seed.sql
+migrate.sql
+migrate.log
+
+# Wrangler
+.wrangler/
