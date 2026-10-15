@@ -24,3 +24,5 @@ migrate.log
 
 # Wrangler
 .wrangler/
+wrangler.prod.toml
+wrangler.dev.toml

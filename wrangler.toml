@@ -13,4 +13,4 @@ binding = "R2"
 bucket_name = "jsot-uploads"
 
 [vars]
-JWT_SECRET = "jsot-jwt-secret-2026-cloudgenz"
+JWT_SECRET = "jsot-jwt-secret-2026-cloudgenz-prod"
