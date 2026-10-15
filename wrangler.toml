@@ -1,16 +1,16 @@
-name = "jsot"
+name = "jsot-dev"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
 pages_build_output_dir = "frontend/dist"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "jsot-db"
-database_id = "d4af4bee-5a99-4b1a-9416-01568027fefd"
+database_name = "jsot-db-dev"
+database_id = "6ad82a0b-6d24-4232-b30e-cff5e7de1ad4"
 
 [[r2_buckets]]
 binding = "R2"
-bucket_name = "jsot-uploads"
+bucket_name = "jsot-uploads-dev"
 
 [vars]
-JWT_SECRET = "jsot-jwt-secret-2026-cloudgenz"
+JWT_SECRET = "jsot-jwt-secret-2026-cloudgenz-dev"
