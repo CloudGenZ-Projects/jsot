@@ -62,10 +62,11 @@ export function ResourceLibrary() {
           api.get('/videos')
         ]);
 
-        // --- FILTERING LOGIC ADDED HERE ---
-        // Only keep items where isFeatured is true
-        const featuredArticles = articlesRes.data.filter(item => item.isFeatured === true);
-        const featuredVideos = videosRes.data.filter(item => item.isFeatured === true);
+        // --- FILTERING LOGIC ---
+        // Handles boolean true, number 1 (from MySQL TINYINT), and string "1"/"true"
+        const isItemFeatured = (item: any) => Boolean(item?.isFeatured === true || item?.isFeatured === 1 || item?.isFeatured === '1' || item?.isFeatured === 'true');
+        const featuredArticles = (articlesRes.data || []).filter(isItemFeatured);
+        const featuredVideos = (videosRes.data || []).filter(isItemFeatured);
 
         setArticles(featuredArticles);
         setVideos(featuredVideos);
