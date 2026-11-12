@@ -90,6 +90,13 @@ const boardMembers = [
     phone: "+1 (416) 520-7427",
     image: hiteshImg,
   },
+  {
+    name: "Vipul Shah",
+    role: "Ex-Officio",
+    image: null, 
+    email: "vipul.jsot@gmail.com",
+    phone: "+1 (416) 575-7598"
+  }
 ];
 
 // --- DATA: MANAGEMENT COMMITTEE ---
